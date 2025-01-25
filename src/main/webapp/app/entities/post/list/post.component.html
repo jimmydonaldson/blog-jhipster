@@ -1,0 +1,63 @@
+<div>
+  <h2 id="page-heading" data-cy="PostHeading">
+    <span jhiTranslate="blogApp.post.home.title">Posts</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="blogApp.post.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-post"
+        [routerLink]="['/post/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="blogApp.post.home.createLabel">Create a new Post</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (posts().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="blogApp.post.home.notFound">No Posts found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <div infinite-scroll (scrolled)="loadNextPage()" [infiniteScrollDisabled]="!hasMorePage()" [infiniteScrollDistance]="0">
+        @for (post of posts(); track trackId(post)) {
+          <div class="blog-post-card mb-4 p-3 border rounded">
+            <a [routerLink]="['/post', post.id, 'view']" class="text-decoration-none">
+              <h2 class="text-primary">{{ post.title }}</h2>
+            </a>
+            <small class="text-muted">
+              Posted on {{ post.date | formatMediumDatetime }}
+              @if (post.blog) {
+                <span
+                  >in <a [routerLink]="['/blog', post.blog.id, 'view']">{{ post.blog.name }}</a></span
+                >
+              }
+            </small>
+            <div class="mt-2 mb-3" [innerHTML]="post.content"></div>
+            <div class="btn-group">
+              <a [routerLink]="['/post', post.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </a>
+              <button type="submit" (click)="delete(post)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
